@@ -1,10 +1,10 @@
 export async function POST(req: Request) {
-   return new Response(await fetch(`https://${process.env.VERCEL_URL}/api/upload`, {
+   return new Response(await fetch(`https://crypto-stream.vercel.app/api/upload`, {
       method: "POST",
       body: await req.arrayBuffer() 
     })
 
-      .then(async res => fetch(`https://${process.env.VERCEL_URL}/api/decrypt`, {
+      .then(async res => fetch(`https://crypto-stream.vercel.app/api/decrypt`, {
         method: "POST",
         body: await res.arrayBuffer()
       })
