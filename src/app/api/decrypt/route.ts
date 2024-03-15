@@ -3,7 +3,6 @@ import { Decipher, createDecipheriv, scryptSync } from "node:crypto";
 const key = scryptSync("password", "salt", 24);
 
 function parseBlockLength(num: Uint8Array) {
-  console.log("decrypt", Buffer.from(num).toString("hex"))
   return Buffer.from(num).readUInt32BE()
 }
 
@@ -41,11 +40,9 @@ export async function POST(req: Request) {
             buffer = buffer.slice(blockSize)
             blockSize = -1
             controller.enqueue(block)
-            console.log("decrypt", blockSize, buffer.length)
           }
         },
         flush(controller) {
-          console.log("flush", buffer?.length)
           if (buffer?.length && buffer.length > 0) {
             controller.enqueue(buffer.slice(4))
           }
