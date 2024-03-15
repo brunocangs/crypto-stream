@@ -13,7 +13,7 @@ function padLength(num: number) {
 
 
 export async function POST(req: Request) {
-  const cipher = createCipheriv('aes-192-cbc', key, iv)
+  let cipher = createCipheriv('aes-192-cbc', key, iv)
   if (!req.body) return new Response('No body', { status: 400 })
   return new Response(
     req.body.pipeThrough(
@@ -23,13 +23,15 @@ export async function POST(req: Request) {
           controller.enqueue(iv)
         },
         transform(chunk, controller) {
+          cipher = createCipheriv('aes-192-cbc', key, iv)
           // Cada bloco começa com 4 bytes contendo o tamanho do bloco
-          controller.enqueue(padLength(chunk.length))
-          // Seguido pelo dado do bloco
-          controller.enqueue(cipher.update(chunk))
+          const ciphered = Buffer.concat([cipher.update(chunk), cipher.final()])
+          controller.enqueue(Buffer.concat([padLength(ciphered.length), ciphered]))
         },
         flush(controller) {
-          controller.enqueue(cipher.final())
+          /* const final = cipher.final()
+          console.log("final", final.length)
+          controller.enqueue(Buffer.concat([padLength(final.length), final])) */
         }
       })
     )
